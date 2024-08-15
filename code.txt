@@ -1,0 +1,46 @@
+for (const [index, imagen] of imagenes.entries()) {
+    Tesseract.recognize(
+      imagen,
+      'spa',
+      {
+        logger: m => {
+          console.log(m)
+        }
+      }
+    ).then(({ data }) => {
+      // console.log(`${i}:`, data);
+      let informacion = {};
+      for (let i = 0; i < data.lines.length; i++) {
+        // const element = array[i];
+        const isTrue = data.lines[i].text.includes('NOMBRES Y APELLIDOS:');
+        if (isTrue) {
+          informacion.id = index;
+          informacion.nombre = data.lines[i].text.replace('NOMBRES Y APELLIDOS', '').replace("|", '').replace("\n", '').replace(":", "").trimStart();
+        }
+        const isTrueDNI = data.lines[i].text.includes('Número de DNI');
+        if (isTrueDNI) {
+          informacion.dni = data.lines[i].text.replace('Número de DNI', '').replace("\n", '').replace(":", "").trimStart();
+        }
+        const isTrueEmpresa = data.lines[i].text.includes('RAZON SOCIAL');
+        if (isTrueEmpresa) {
+          informacion.empresa = data.lines[i].text.replace('RAZON SOCIAL', '').replace("\n", '').replace(":", "").replace("|", '').trimStart();
+          break;
+        }
+      }
+      finalExtractData = [...finalExtractData, informacion];
+      console.log(finalExtractData);
+    })
+      .catch(e => console.log(e))
+    if (imagenes.length) {
+      await imprimir();
+      // return finalExtractData;
+    }
+  }
+
+
+
+
+
+  VARIANTES
+
+  Número de DN
